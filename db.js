@@ -6,6 +6,17 @@ const pool = new Pool({
 });
 
 async function migrate() {
+  // Drop old tables from previous Discord-based build
+  await pool.query(`
+    DROP TABLE IF EXISTS assessments CASCADE;
+    DROP TABLE IF EXISTS duels CASCADE;
+    DROP TABLE IF EXISTS combat_log CASCADE;
+    DROP TABLE IF EXISTS zones CASCADE;
+    DROP TABLE IF EXISTS quests CASCADE;
+    DROP TABLE IF EXISTS inventory CASCADE;
+    DROP TABLE IF EXISTS players CASCADE;
+  `);
+
   await pool.query(`
     CREATE TABLE IF NOT EXISTS players (
       id SERIAL PRIMARY KEY,
