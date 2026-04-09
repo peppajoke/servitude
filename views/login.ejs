@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERVITUDE — A Game of Obedience</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box">
+      <h1>SERVITUDE</h1>
+      <div class="subtitle">A Game of Obedience</div>
+
+      <% if (message) { %>
+        <div class="flavor"><%= message %></div>
+      <% } %>
+
+      <% if (error) { %>
+        <div class="message error"><%= error %></div>
+      <% } %>
+
+      <form method="POST" action="/login">
+        <input type="text" name="name" placeholder="Enter your name, servant" maxlength="20" required autofocus>
+        <button type="submit" class="btn" style="width:100%">Enter Servitude</button>
+      </form>
+
+      <div style="margin-top: 1.5rem; color: var(--text-dim); font-size: 0.85rem;">
+        <a href="/leaderboard">Leaderboard</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

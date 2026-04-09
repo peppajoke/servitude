@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERVITUDE — Choose Your Role</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <div class="login-page">
+    <div class="login-box" style="max-width: 600px;">
+      <h1>SERVITUDE</h1>
+      <div class="subtitle">Another servant. How... adequate.</div>
+
+      <% if (error) { %>
+        <div class="message error"><%= error %></div>
+      <% } %>
+
+      <p style="margin: 1rem 0; color: var(--text-dim);">
+        Welcome, <strong style="color: var(--gold);"><%= name %></strong>.
+        The Mistress requires you to choose a role. Choose wisely. Or don't. She barely cares.
+      </p>
+
+      <form method="POST" action="/create" id="createForm">
+        <input type="hidden" name="name" value="<%= name %>">
+        <input type="hidden" name="className" id="selectedClass" value="">
+
+        <div class="class-grid">
+          <% for (const [cls, info] of Object.entries(classes)) { %>
+            <div class="class-card" onclick="selectClass('<%= cls %>', this)">
+              <h3><%= cls %></h3>
+              <div class="class-desc"><%= info.desc %></div>
+              <div class="class-stats">
+                STR <%= info.str %> · WIT <%= info.wit %> · DEV <%= info.dev %> · LUCK <%= info.luck %> · HP <%= info.hp %>
+              </div>
+            </div>
+          <% } %>
+        </div>
+
+        <button type="submit" class="btn" style="width:100%" id="submitBtn" disabled>Select a Role</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    function selectClass(cls, el) {
+      document.getElementById('selectedClass').value = cls;
+      document.querySelectorAll('.class-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      const btn = document.getElementById('submitBtn');
+      btn.disabled = false;
+      btn.textContent = 'Serve as ' + cls;
+    }
+  </script>
+</body>
+</html>

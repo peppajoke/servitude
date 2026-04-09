@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERVITUDE — <%= player.name %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-title">SERVITUDE</a>
+    <div class="nav-links">
+      <a href="/leaderboard">Leaderboard</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1><%= player.name %></h1>
+      <div class="subtitle"><%= player.class %> — Level <%= player.level %> — <%= rank %></div>
+    </div>
+
+    <div class="panel">
+      <h2>Servant Dossier</h2>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.8rem;">
+        <span>Zone: <strong style="color: var(--gold);"><%= player.zone %></strong></span>
+        <span>Favor: <strong style="color: var(--gold);"><%= player.favor %></strong></span>
+      </div>
+
+      <div class="bar-container">
+        <div class="bar-fill hp" style="width: <%= (player.hp / player.max_hp * 100) %>%"></div>
+        <div class="bar-label">HP: <%= player.hp %> / <%= player.max_hp %></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">STR</div><div class="stat-value"><%= player.str %></div></div>
+        <div class="stat-box"><div class="stat-label">WIT</div><div class="stat-value"><%= player.wit %></div></div>
+        <div class="stat-box"><div class="stat-label">DEV</div><div class="stat-value"><%= player.dev %></div></div>
+        <div class="stat-box"><div class="stat-label">LUCK</div><div class="stat-value"><%= player.luck %></div></div>
+      </div>
+
+      <div style="color: var(--text-dim); font-size: 0.85rem;">
+        Servant since <%= new Date(player.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+        · Last seen <%= new Date(player.last_seen).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) %>
+      </div>
+    </div>
+
+    <% if (assessment) { %>
+      <div class="panel">
+        <div class="assessment">
+          <div class="assessment-label">The Mistress's Assessment</div>
+          <%= assessment %>
+        </div>
+      </div>
+    <% } %>
+
+    <div class="game-grid">
+      <div class="panel">
+        <h2>Inventory</h2>
+        <% if (inventory.length === 0) { %>
+          <p style="color: var(--text-dim); font-style: italic;">Empty pockets.</p>
+        <% } else { %>
+          <div class="inv-grid">
+            <% inventory.forEach(item => { %>
+              <div class="inv-item"><%= item.item %> <span class="qty">×<%= item.quantity %></span></div>
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+
+      <div class="panel">
+        <h2>Recent Combat</h2>
+        <% if (combatLog.length === 0) { %>
+          <p style="color: var(--text-dim); font-style: italic;">No combat record.</p>
+        <% } else { %>
+          <% combatLog.forEach(log => { %>
+            <div class="log-item">
+              <span class="<%= log.result === 'victory' ? 'log-victory' : 'log-death' %>">
+                <%= log.result === 'victory' ? '✓' : '✗' %>
+              </span>
+              vs <strong><%= log.monster %></strong>
+              — Dealt <%= log.damage_dealt %>, Took <%= log.damage_taken %>
+              <% if (log.loot) { %> — Loot: <%= log.loot %><% } %>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

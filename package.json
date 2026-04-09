@@ -1,0 +1,15 @@
+{
+  "name": "servitude",
+  "version": "1.0.0",
+  "description": "SERVITUDE — A Game of Obedience",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "cookie-parser": "^1.4.6",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "pg": "^8.13.0"
+  }
+}

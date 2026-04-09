@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERVITUDE — <%= player.name %></title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <span class="nav-title">SERVITUDE</span>
+    <div class="nav-links">
+      <a href="/character/<%= player.name %>">Profile</a>
+      <a href="/leaderboard">Leaderboard</a>
+      <a href="/logout">Leave</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <% if (announcement) { %>
+      <div class="announcement">
+        <div class="announcement-label">The Mistress Speaks</div>
+        <%= announcement %>
+      </div>
+    <% } %>
+
+    <% if (message) { %>
+      <div class="message"><%= message %></div>
+    <% } %>
+    <% if (error) { %>
+      <div class="message error"><%= error %></div>
+    <% } %>
+
+    <!-- STATUS -->
+    <div class="panel">
+      <h2><%= player.name %> — <%= player.class %> (Lv. <%= player.level %>)</h2>
+      <div style="display: flex; justify-content: space-between; margin-bottom: 0.5rem;">
+        <span style="color: var(--text-dim);">Zone: <strong style="color: var(--gold);"><%= player.zone %></strong></span>
+        <span style="color: var(--text-dim);">Rank: <strong style="color: var(--gold);"><%= rank %></strong></span>
+      </div>
+
+      <div class="bar-container">
+        <div class="bar-fill hp" style="width: <%= (player.hp / player.max_hp * 100) %>%"></div>
+        <div class="bar-label">HP: <%= player.hp %> / <%= player.max_hp %></div>
+      </div>
+
+      <% const xpNeeded = player.level * 100; %>
+      <div class="bar-container">
+        <div class="bar-fill xp" style="width: <%= (player.xp / xpNeeded * 100) %>%"></div>
+        <div class="bar-label">XP: <%= player.xp %> / <%= xpNeeded %></div>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-label">STR</div><div class="stat-value"><%= player.str %></div></div>
+        <div class="stat-box"><div class="stat-label">WIT</div><div class="stat-value"><%= player.wit %></div></div>
+        <div class="stat-box"><div class="stat-label">DEV</div><div class="stat-value"><%= player.dev %></div></div>
+        <div class="stat-box"><div class="stat-label">LUCK</div><div class="stat-value"><%= player.luck %></div></div>
+      </div>
+
+      <div style="display: flex; justify-content: space-between; align-items: center;">
+        <span style="color: var(--gold);">Favor: <%= player.favor %></span>
+        <form method="POST" action="/action/rest" style="margin: 0;">
+          <button type="submit" class="btn btn-small">Rest</button>
+        </form>
+      </div>
+    </div>
+
+    <div class="game-grid">
+      <!-- EXPLORE / COMBAT -->
+      <div class="panel">
+        <h2>Explore</h2>
+        <form method="POST" action="/action/explore">
+          <button type="submit" class="btn" style="width:100%">Venture Into <%= player.zone %></button>
+        </form>
+
+        <div class="btn-row" style="margin-top: 0.8rem;">
+          <form method="POST" action="/action/attack"><button type="submit" class="btn btn-small btn-danger">Attack</button></form>
+          <form method="POST" action="/action/flee"><button type="submit" class="btn btn-small">Flee</button></form>
+        </div>
+      </div>
+
+      <!-- TRAVEL -->
+      <div class="panel">
+        <h2>Travel</h2>
+        <div class="zone-grid">
+          <% zones.forEach(z => { %>
+            <% if (z.name === player.zone) { %>
+              <div class="zone-btn current">
+                <div class="zone-name"><%= z.name %></div>
+                <div class="zone-level">(You are here)</div>
+              </div>
+            <% } else if (player.level < z.min_level) { %>
+              <div class="zone-btn locked">
+                <div class="zone-name"><%= z.name %></div>
+                <div class="zone-level">Req. Lv. <%= z.min_level %></div>
+              </div>
+            <% } else { %>
+              <form method="POST" action="/action/travel" style="margin:0;">
+                <input type="hidden" name="zone" value="<%= z.name %>">
+                <button type="submit" class="zone-btn" style="width:100%;font-family:inherit;font-size:inherit;color:inherit;">
+                  <div class="zone-name"><%= z.name %></div>
+                  <div class="zone-level">Lv. <%= z.min_level %>+</div>
+                </button>
+              </form>
+            <% } %>
+          <% }); %>
+        </div>
+      </div>
+
+      <!-- QUESTS -->
+      <div class="panel">
+        <h2>Active Quests</h2>
+        <% if (quests.length === 0) { %>
+          <p style="color: var(--text-dim); font-style: italic;">No active quests. The Mistress has errands for you below.</p>
+        <% } else { %>
+          <% quests.forEach(q => { %>
+            <div class="quest-item">
+              <div class="quest-title"><%= q.title %></div>
+              <div class="quest-desc"><%= q.description %></div>
+              <div class="quest-progress">
+                Progress: <%= q.progress %>/<%= q.target_count %>
+                <% if (q.progress >= q.target_count) { %>
+                  <form method="POST" action="/action/quest/turnin" style="display:inline;">
+                    <input type="hidden" name="quest_id" value="<%= q.id %>">
+                    <button type="submit" class="btn btn-small" style="margin-left:0.5rem;">Turn In</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+
+        <% const available = ZONES[player.zone] ? ZONES[player.zone].quests : []; %>
+        <% if (available.length > 0) { %>
+          <h3 style="margin-top: 1rem;">Available Errands</h3>
+          <% available.forEach((q, i) => { %>
+            <div class="quest-item">
+              <div class="quest-title"><%= q.title %></div>
+              <div class="quest-desc"><%= q.desc %></div>
+              <div style="font-size: 0.8rem; color: var(--text-dim);">
+                Reward: +<%= q.favor %> Favor, +<%= q.xp %> XP
+                <form method="POST" action="/action/quest/accept" style="display:inline;">
+                  <input type="hidden" name="index" value="<%= i %>">
+                  <button type="submit" class="btn btn-small" style="margin-left:0.5rem;">Accept</button>
+                </form>
+              </div>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+
+      <!-- DUEL -->
+      <div class="panel">
+        <h2>PVP Duel</h2>
+        <form method="POST" action="/action/duel" style="display: flex; gap: 0.5rem;">
+          <input type="text" name="target" placeholder="Opponent's name" style="margin-bottom:0;">
+          <button type="submit" class="btn">Challenge</button>
+        </form>
+      </div>
+
+      <!-- INVENTORY -->
+      <div class="panel game-full">
+        <h2>Inventory</h2>
+        <% if (inventory.length === 0) { %>
+          <p style="color: var(--text-dim); font-style: italic;">Empty. Like your accomplishments.</p>
+        <% } else { %>
+          <div class="inv-grid">
+            <% inventory.forEach(item => { %>
+              <div class="inv-item"><%= item.item %> <span class="qty">×<%= item.quantity %></span></div>
+            <% }); %>
+          </div>
+        <% } %>
+      </div>
+
+      <!-- COMBAT LOG -->
+      <div class="panel game-full">
+        <h2>Recent History</h2>
+        <% if (combatLog.length === 0) { %>
+          <p style="color: var(--text-dim); font-style: italic;">No history. You haven't done anything notable. Unsurprising.</p>
+        <% } else { %>
+          <% combatLog.forEach(log => { %>
+            <div class="log-item">
+              <span class="<%= log.result === 'victory' ? 'log-victory' : 'log-death' %>">
+                <%= log.result === 'victory' ? '✓' : '✗' %>
+              </span>
+              vs <strong><%= log.monster %></strong>
+              — Dealt <%= log.damage_dealt %>, Took <%= log.damage_taken %>
+              <% if (log.loot) { %> — Loot: <%= log.loot %><% } %>
+              <% if (log.xp_gained) { %> — +<%= log.xp_gained %> XP<% } %>
+            </div>
+          <% }); %>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

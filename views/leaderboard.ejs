@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SERVITUDE — Leaderboard</title>
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <nav class="nav">
+    <a href="/" class="nav-title">SERVITUDE</a>
+    <div class="nav-links">
+      <a href="/">Play</a>
+    </div>
+  </nav>
+
+  <div class="container">
+    <div class="header">
+      <h1>The Mistress's Favorites</h1>
+      <div class="subtitle">Ranked by Favor. As all things should be.</div>
+    </div>
+
+    <div class="panel">
+      <% if (leaders.length === 0) { %>
+        <p style="color: var(--text-dim); font-style: italic; text-align: center; padding: 2rem;">
+          No servants yet. The Mistress waits. Impatiently.
+        </p>
+      <% } else { %>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Servant</th>
+              <th>Class</th>
+              <th>Level</th>
+              <th>Favor</th>
+              <th>Rank</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% leaders.forEach((p, i) => { %>
+              <tr class="rank-<%= i + 1 %>">
+                <td><%= i + 1 %></td>
+                <td><a href="/character/<%= p.name %>"><%= p.name %></a></td>
+                <td><%= p.class %></td>
+                <td><%= p.level %></td>
+                <td><%= p.favor %></td>
+                <td><%= favorRank(p.favor) %></td>
+              </tr>
+            <% }); %>
+          </tbody>
+        </table>
+      <% } %>
+    </div>
+  </div>
+</body>
+</html>
